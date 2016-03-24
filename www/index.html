@@ -42,7 +42,7 @@
 <script>
 
     function refreshVideoView() {
-        if (device.platform == 'iOS'){
+        if ((typeof device !== "undefined") && device.platform == 'iOS'){
             console.log("REFRESH");
             cordova.plugins.iosrtc.refreshVideos();
         }
@@ -113,7 +113,7 @@
 
     function onDeviceReady() {
 
-        if (device.platform == 'iOS'){
+        if ((typeof device !== "undefined") && device.platform == 'iOS'){
             cordova.plugins.iosrtc.registerGlobals();
         }
 
@@ -125,7 +125,12 @@
 
     }
 
-    document.addEventListener("deviceready", onDeviceReady, false);
+    var app = document.URL.indexOf( 'https://' ) === -1;
+    if ( app ) {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    } else {
+        onDeviceReady();
+    }
 </script>
 </body>
 </html>

@@ -21,11 +21,13 @@ cordova build ios
 cordova run ios
 ```
 
+Open [this link](https://demo.apizee.com/mobile/index.html) with chrome to exchange with your mobile over webrtc
+
 ## ApiRTC key
 For this demo we use the Api key "myDemoApiKey". Please register on [our website](https://apirtc.com/get-key/) to get your private api key.
 
 ## Commun build error
-To avoid errors, we use the plugin cordova-custom-config. But you can find solutions here :
+To avoid errors, we use the plugin cordova-custom-config to integrate all xcode configuration. But you can find solutions here :
 
 **Build error**
 
