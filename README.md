@@ -54,7 +54,7 @@ Go to Build Settings, Build Option, edit the setting “Enable bitcode” to “
 
 **Runtime error**
 
-Thread 1: EXC_BREAKPOINT (code=EXC_ARM_BREAKPOINT, subcode=0xe7ffdefe)” Meanwhile, the output console shows: dyld: Library not loaded: @rpath/libswiftCore.dylib Referenced from: /private/var/mobile/Containers/Bundle/Application/CD802A78-4D2F-4976-A123-4B8316A870BA/WebRTCSample.app/WebRTCSample Reason: image not found
+Thread 1: EXC_BREAKPOINT (code=EXC_ARM_BREAKPOINT, subcode=0xe7ffdefe)” Meanwhile, the output console shows: dyld: Library not loaded: @rpath/libswiftCore.dylib Referenced from: /private/var/mobile/Containers/Bundle/Application/XX/WebRTCSample.app/WebRTCSample Reason: image not found
 
 **Solution**
 
