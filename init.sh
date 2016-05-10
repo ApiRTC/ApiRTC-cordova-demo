@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cordova platform add ios@3.9.2
+cordova platform add ios
 
 cordova plugin add cordova-plugin-console
 cordova plugin add cordova-custom-config

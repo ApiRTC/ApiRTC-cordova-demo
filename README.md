@@ -6,7 +6,7 @@ First of all you need to install Cordova. Please follow [this link](https://cord
 To build this example you need to add a target platform and some plugin
 ```
 git clone https://github.com/apizee/ApiRTC-mobile.git
-cordova platform add ios@3.9.2
+cordova platform add ios
 cordova plugin add cordova-plugin-console
 cordova plugin add cordova-custom-config
 cordova plugin add cordova-plugin-device
