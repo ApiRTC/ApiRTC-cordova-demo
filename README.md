@@ -12,6 +12,7 @@ cordova plugin add cordova-plugin-console
 cordova plugin add cordova-custom-config
 cordova plugin add cordova-plugin-device
 cordova plugin add cordova-plugin-iosrtc
+cordova plugin add android-camera-permission
 ```
 
 After run emulator like that :
