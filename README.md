@@ -1,5 +1,5 @@
 # ApiRTC on Cordova
-This tutorial explains you how to use apiRTC and to build an application for iOS.
+This tutorial explains you how to use apiRTC and to build an application for iOS and android.
 
 First of all you need to install Cordova. Please follow [this link](https://cordova.apache.org/docs/en/latest/guide/cli/index.html) to start with cordova
 
@@ -7,18 +7,20 @@ To build this example you need to add a target platform and some plugin
 ```
 git clone https://github.com/apizee/ApiRTC-mobile.git
 cordova platform add ios
+cordova platform add android
 cordova plugin add cordova-plugin-console
 cordova plugin add cordova-custom-config
 cordova plugin add cordova-plugin-device
 cordova plugin add cordova-plugin-iosrtc
 ```
 
-Be carefull to add the good version of ios platform because iosrtc is not compatible with last version 4.x
-
 After run emulator like that :
 ```
 cordova build ios
 cordova run ios
+
+cordova build android
+cordova run android --device
 ```
 
 Open [this link](https://demo.apizee.com/mobile/index.html) with chrome to exchange with your mobile over webrtc
@@ -61,6 +63,3 @@ Thread 1: EXC_BREAKPOINT (code=EXC_ARM_BREAKPOINT, subcode=0xe7ffdefe)” Meanwh
 **Solution**
 
 Go to Build Settings, look under Linking, edit “Runpath Search Paths”, and add the path @executable_path/Frameworks in debug and release
-
-## Coming soon
-- Android version

@@ -18,6 +18,20 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="android-minSdkVersion" value="22" />
+
+        <icon src="res/android/icon-mdpi.png" density="mdpi" />
+        <icon src="res/android/icon-hdpi.png" density="hdpi" />
+        <icon src="res/android/icon-xhdpi.png" density="xhdpi" />
+        <icon src="res/android/icon-xxhdpi.png" density="xxhdpi" />
+        <icon src="res/android/icon-xxxhdpi.png" density="xxxhdpi" />
+
+        <splash src="res/screen/android/port-hdpi-480x800.png" density="port-hdpi"/>
+        <splash src="res/screen/android/port-ldpi-200x320.png" density="port-ldpi"/>
+        <splash src="res/screen/android/port-mdpi-320x480.png" density="port-mdpi"/>
+        <splash src="res/screen/android/port-xhdpi-720x1280.png" density="port-xhdpi"/>
+        <splash src="res/screen/android/port-xxhdpi-960x1600.png" density="port-xxhdpi"/>
+        <splash src="res/screen/android/port-xxxhdpi-1280x1920.png" density="port-xxxhdpi"/>
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
