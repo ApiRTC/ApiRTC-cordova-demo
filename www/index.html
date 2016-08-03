@@ -117,6 +117,29 @@
             cordova.plugins.iosrtc.registerGlobals();
         }
 
+
+        if ((typeof device !== "undefined") && device.platform == 'Android'){
+            alert(device.version);
+            var permissions = cordova.plugins.permissions;
+            permissions.hasPermission(permissions.CAMERA, checkPermissionCallback, null);
+
+            function checkPermissionCallback(status) {
+                if(!status.hasPermission) {
+                    var errorCallback = function() {
+                        alert('Camera permission is not turned on');
+                    }
+                    permissions.requestPermission(
+                            permissions.CAMERA,
+                            function(status) {
+                                if(!status.hasPermission) {
+                                    errorCallback();
+                                }
+                            },
+                            errorCallback);
+                }
+            }
+        }
+
         apiRTC.init({
             //apiCCId : "12", // Your can overide your number
             onReady: sessionReadyHandler,
