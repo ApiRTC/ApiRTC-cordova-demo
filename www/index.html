@@ -119,17 +119,33 @@
 
 
         if ((typeof device !== "undefined") && device.platform == 'Android'){
-            alert(device.version);
             var permissions = cordova.plugins.permissions;
-            permissions.hasPermission(permissions.CAMERA, checkPermissionCallback, null);
+            permissions.hasPermission(permissions.CAMERA, checkVideoPermissionCallback, null);
+            permissions.hasPermission(permissions.RECORD_AUDIO, checkAudioPermissionCallback, null);
 
-            function checkPermissionCallback(status) {
+            function checkVideoPermissionCallback(status) {
                 if(!status.hasPermission) {
                     var errorCallback = function() {
                         alert('Camera permission is not turned on');
                     }
                     permissions.requestPermission(
                             permissions.CAMERA,
+                            function(status) {
+                                if(!status.hasPermission) {
+                                    errorCallback();
+                                }
+                            },
+                            errorCallback);
+                }
+            }
+
+            function checkAudioPermissionCallback(status) {
+                if(!status.hasPermission) {
+                    var errorCallback = function() {
+                        alert('Audio permission is not turned on');
+                    }
+                    permissions.requestPermission(
+                            permissions.RECORD_AUDIO,
                             function(status) {
                                 if(!status.hasPermission) {
                                     errorCallback();
