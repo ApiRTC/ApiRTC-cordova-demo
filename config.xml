@@ -51,6 +51,7 @@
         <preference name="UIWebViewBounce" value="false" />
         <preference name="DisallowOverscroll" value="true" />
 
+        <preference name="ios-XCBuildConfiguration-SWIFT_VERSION" value="2.3" />
         <preference name="ios-XCBuildConfiguration-ENABLE_BITCODE" value="NO" />
         <preference name="ios-XCBuildConfiguration-SWIFT_OBJC_BRIDGING_HEADER" value="../../plugins/cordova-plugin-iosrtc/src/cordova-plugin-iosrtc-Bridging-Header.h" />
         <preference name="ios-XCBuildConfiguration-LD_RUNPATH_SEARCH_PATHS" value="@executable_path/Frameworks" />
