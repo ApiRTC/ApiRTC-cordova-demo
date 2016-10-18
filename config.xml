@@ -59,6 +59,12 @@
         <config-file parent="CFBundleVersion" platform="ios" target="*-Info.plist">
             <string>11</string>
         </config-file>
+        <config-file parent="NSCameraUsageDescription" platform="ios" target="*-Info.plist">
+            <string>Use for phone call</string>
+        </config-file>
+        <config-file parent="NSMicrophoneUsageDescription" platform="ios" target="*-Info.plist">
+            <string>Use for phone call</string>
+        </config-file>
 
         <!-- iOS 8.0+ -->
         <!-- iPhone 6 Plus  -->
