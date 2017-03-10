@@ -29,6 +29,19 @@
     <div class="row" style="text-align: center;">
         <span id="status" style="text-align: center">Registration Ongoing...</span>
     </div>
+    <div class="row">
+        <label>Audio source:</label>
+        <select class="browser-default" id='audioSource'>
+            <option value="" disabled selected>Choose your option</option>
+        </select>
+    </div>
+    <div class="row">
+        <label>Video source:</label>
+        <select class="browser-default" id='videoSource'>
+            <option value="" disabled selected>Choose your option</option>
+        </select>
+    </div>
+
     <div class="row" style="margin-top: 20px">
         <div class="remote" id="myRemoteVideo" style="width:100%;"></div>
     </div>
@@ -37,9 +50,22 @@
     </div>
 </div>
 
-
-
 <script>
+    var webRTCClient = null,
+        audioSelect = document.querySelector("select#audioSource"),
+        videoSelect = document.querySelector("select#videoSource");
+
+    function selectMediaChange(){
+        console.log('selectMediaChange');
+        webRTCClient.setAudioSourceId(audioSelect.value);
+        //Storing audioSourceId in localStorage
+        localStorage.setItem("audioSourceId_" + apiRTC.session.apiCCId, audioSelect.value);
+        webRTCClient.setVideoSourceId(videoSelect.value);
+        //Storing videoSourceId in localStorage
+        localStorage.setItem("videoSourceId_" + apiRTC.session.apiCCId, videoSelect.value);
+    }
+    audioSelect.onchange = selectMediaChange;
+    videoSelect.onchange = selectMediaChange;
 
     function refreshVideoView() {
         if ((typeof device !== "undefined") && device.platform == 'iOS'){
@@ -74,6 +100,65 @@
         refreshVideoView();
     }
 
+    function gotSources(sourceInfos) {
+        console.log('gotSources');
+        var audioDeviceFound = false,
+        videoDeviceFound = false,
+        i = 0,
+        audioSourceIdInLocalStorage = localStorage.getItem('audioSourceId_' + apiRTC.session.apiCCId),
+        videoSourceIdInLocalStorage = localStorage.getItem('videoSourceId_' + apiRTC.session.apiCCId);
+
+        if(sourceInfos !== null) {
+            for (i = 0; i != sourceInfos.length; ++i) {
+                var sourceInfo = sourceInfos[i];
+                console.log('sourceInfo :', sourceInfo);
+                var option = document.createElement("option");
+                option.value = sourceInfo.id || sourceInfo.deviceId;
+                console.log('option.value :', option.value);
+                //ENUMERATE
+                if (sourceInfo.kind === 'audio' || sourceInfo.kind === 'audioinput') {
+                    //ENUMERATE
+                    console.log('audio');
+                    option.text = sourceInfo.label || 'microphone ' + (audioSelect.length);
+                    audioSelect.appendChild(option);
+                    //ENUMERATE
+                } else if (sourceInfo.kind === 'video' || sourceInfo.kind === 'videoinput') {
+                    //ENUMERATE
+                    console.log('video');
+                    option.text = sourceInfo.label || 'camera ' + (videoSelect.length);
+                    videoSelect.appendChild(option);
+                } else {
+                    console.log('Some other kind of source: ', sourceInfo);
+                }
+                if (sourceInfo.id === audioSourceIdInLocalStorage) {
+                    audioDeviceFound = true;
+                }
+                if (sourceInfo.id === videoSourceIdInLocalStorage) {
+                    videoDeviceFound = true;
+                }
+            }
+        } else {
+            console.log("Media detection is not supported by browser");
+        }
+
+        if (audioDeviceFound) {
+            console.log("setting with localStorage audioSourceId value");
+            audioSelect.value = audioSourceIdInLocalStorage;
+            webRTCClient.setAudioSourceId(audioSourceIdInLocalStorage);
+        } else {
+            //removing audioSourceId from localStorage
+            localStorage.removeItem("audioSourceId_" + apiRTC.session.apiCCId);
+        }
+        if (videoDeviceFound) {
+            console.log("setting with localStorage videoSourceId value");
+            videoSelect.value = videoSourceIdInLocalStorage;
+            webRTCClient.setVideoSourceId(videoSourceIdInLocalStorage);
+        } else {
+            //removing videoSourceId from localStorage
+            localStorage.removeItem("videoSourceId_" + + apiRTC.session.apiCCId);
+        }
+    }
+
     function sessionReadyHandler(e) {
 
         apiRTC.addEventListener("incomingCall", incomingCallHandler);
@@ -81,10 +166,12 @@
         apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
         apiRTC.addEventListener("hangup", hangupHandler);
 
-        var webRTCClient = apiCC.session.createWebRTCClient({
+        webRTCClient = apiCC.session.createWebRTCClient({
             minilocalVideo : "myMiniVideo",
             remoteVideo : "myRemoteVideo"
         });
+
+        webRTCClient.getMediaDevices(gotSources);
 
         $('#localNumber').html("Your local ID :<BR/>"+apiCC.session.apiCCId);
         $('#myMiniVideo').show();
