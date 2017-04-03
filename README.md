@@ -6,15 +6,15 @@ First of all you need to install Cordova. Please follow [this link](https://cord
 To build this example, you first need to add a target platform and a few plugins
 ```
 git clone https://github.com/apizee/ApiRTC-mobile.git
-cordova platform add ios
-cordova platform add android
 cordova plugin add cordova-plugin-console
 cordova plugin add cordova-custom-config
 cordova plugin add cordova-plugin-device
-cordova plugin add cordova-plugin-iosrtc
+cordova plugin add https://github.com/BasqueVoIPMafia/cordova-plugin-iosrtc.git#4.0.0
 cordova plugin add cordova-plugin-media
 cordova plugin add android-camera-permission
 cordova plugin add cordova-plugin-android-permissions@0.10.0
+cordova platform add ios
+cordova platform add android
 ```
 
 Then, run an emulator like this :
