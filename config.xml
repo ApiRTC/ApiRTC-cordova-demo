@@ -1,8 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.apizee.hellortc" version="0.2.1"
-        xmlns="http://www.w3.org/ns/widgets"
-        xmlns:cdv="http://cordova.apache.org/ns/1.0"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<widget id="com.apizee.hellortc" version="0.2.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>HelloRTC</name>
     <description>
         A sample Apache Cordova application that test APIRTC call.
@@ -11,7 +8,6 @@
         Apizee Team
     </author>
     <content src="index.html" />
-    <plugin name="cordova-plugin-whitelist" spec="1" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -22,40 +18,32 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="21" />
-
         <uses-permission android:name="android.permission.CAMERA" />
         <uses-permission android:name="android.permission.RECORD_AUDIO" />
         <uses-feature android:name="android.hardware.camera" />
-
-        <icon src="res/android/icon-ldpi.png" density="ldpi" />
-        <icon src="res/android/icon-mdpi.png" density="mdpi" />
-        <icon src="res/android/icon-hdpi.png" density="hdpi" />
-        <icon src="res/android/icon-xhdpi.png" density="xhdpi" />
-        <icon src="res/android/icon-xxhdpi.png" density="xxhdpi" />
-        <icon src="res/android/icon-xxxhdpi.png" density="xxxhdpi" />
-
-        <splash src="res/screen/android/port-hdpi-480x800.png" density="port-hdpi"/>
-        <splash src="res/screen/android/port-ldpi-200x320.png" density="port-ldpi"/>
-        <splash src="res/screen/android/port-mdpi-320x480.png" density="port-mdpi"/>
-        <splash src="res/screen/android/port-xhdpi-720x1280.png" density="port-xhdpi"/>
-        <splash src="res/screen/android/port-xxhdpi-960x1600.png" density="port-xxhdpi"/>
-        <splash src="res/screen/android/port-xxxhdpi-1280x1920.png" density="port-xxxhdpi"/>
+        <icon density="ldpi" src="res/android/icon-ldpi.png" />
+        <icon density="mdpi" src="res/android/icon-mdpi.png" />
+        <icon density="hdpi" src="res/android/icon-hdpi.png" />
+        <icon density="xhdpi" src="res/android/icon-xhdpi.png" />
+        <icon density="xxhdpi" src="res/android/icon-xxhdpi.png" />
+        <icon density="xxxhdpi" src="res/android/icon-xxxhdpi.png" />
+        <splash density="port-hdpi" src="res/screen/android/port-hdpi-480x800.png" />
+        <splash density="port-ldpi" src="res/screen/android/port-ldpi-200x320.png" />
+        <splash density="port-mdpi" src="res/screen/android/port-mdpi-320x480.png" />
+        <splash density="port-xhdpi" src="res/screen/android/port-xhdpi-720x1280.png" />
+        <splash density="port-xxhdpi" src="res/screen/android/port-xxhdpi-960x1600.png" />
+        <splash density="port-xxxhdpi" src="res/screen/android/port-xxxhdpi-1280x1920.png" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-
         <preference name="deployment-target" value="9.0" />
         <preference name="BackupWebStorage" value="local" />
-
         <preference name="webviewbounce" value="false" />
         <preference name="UIWebViewBounce" value="false" />
         <preference name="DisallowOverscroll" value="true" />
-
-        <hook type="after_platform_add" src="plugins/cordova-plugin-iosrtc/extra/hooks/iosrtc-swift-support.js" />
-
+        <hook src="plugins/cordova-plugin-iosrtc/extra/hooks/iosrtc-swift-support.js" type="after_platform_add" />
         <preference name="ios-XCBuildConfiguration-ENABLE_BITCODE" value="NO" />
-
         <config-file parent="CFBundleVersion" platform="ios" target="*-Info.plist">
             <string>11</string>
         </config-file>
@@ -65,52 +53,43 @@
         <config-file parent="NSMicrophoneUsageDescription" platform="ios" target="*-Info.plist">
             <string>Use for phone call</string>
         </config-file>
-
-        <!-- iPhone Push  -->
-        <icon src="res/ios/icon-20@2x.png" width="40" height="40" />
-        <icon src="res/ios/icon-20@3x.png" width="60" height="60" />
-
-        <!-- iOS 8.0+ -->
-        <!-- iPhone 6 Plus  -->
-        <icon src="res/ios/icon-60@3x.png" width="180" height="180" />
-        <!-- iOS 7.0+ -->
-        <!-- iPhone / iPod Touch  -->
-        <icon src="res/ios/icon-60.png" width="60" height="60" />
-        <icon src="res/ios/icon-60@2x.png" width="120" height="120" />
-        <!-- iPad -->
-        <icon src="res/ios/icon-76.png" width="76" height="76" />
-        <icon src="res/ios/icon-76@2x.png" width="152" height="152" />
-        <!-- iOS 6.1 -->
-        <!-- Spotlight Icon -->
-        <icon src="res/ios/icon-40.png" width="40" height="40" />
-        <icon src="res/ios/icon-40@2x.png" width="80" height="80" />
-        <icon src="res/ios/icon-40@3x.png" width="120" height="120" />
-        <!-- iPhone / iPod Touch -->
-        <icon src="res/ios/icon.png" width="57" height="57" />
-        <icon src="res/ios/icon@2x.png" width="114" height="114" />
-        <!-- iPad -->
-        <icon src="res/ios/icon-72.png" width="72" height="72" />
-        <icon src="res/ios/icon-72@2x.png" width="144" height="144" />
-        <!-- iPhone Spotlight and Settings Icon -->
-        <icon src="res/ios/icon-small.png" width="29" height="29" />
-        <icon src="res/ios/icon-small@2x.png" width="58" height="58" />
-        <!-- iPad Spotlight and Settings Icon -->
-        <icon src="res/ios/icon-50.png" width="50" height="50" />
-        <icon src="res/ios/icon-50@2x.png" width="100" height="100" />
-        <!-- iPad pro -->
-        <icon src="res/ios/icon-83.5@2x.png" width="167" height="167" />
-
-        <!-- images are determined by width and height. The following are supported -->
-        <splash src="res/screen/ios/Default~iphone.png" width="320" height="480"/>
-        <splash src="res/screen/ios/Default@2x~iphone.png" width="640" height="960"/>
-        <splash src="res/screen/ios/Default-Portrait~ipad.png" width="768" height="1024"/>
-        <splash src="res/screen/ios/Default-Portrait@2x~ipad.png" width="1536" height="2048"/>
-        <splash src="res/screen/ios/Default-Landscape~ipad.png" width="1024" height="768"/>
-        <splash src="res/screen/ios/Default-Landscape@2x~ipad.png" width="2048" height="1536"/>
-        <splash src="res/screen/ios/Default-568h@2x~iphone.png" width="640" height="1136"/>
-        <splash src="res/screen/ios/Default-667h.png" width="750" height="1334"/>
-        <splash src="res/screen/ios/Default-736h.png" width="1242" height="2208"/>
-        <splash src="res/screen/ios/Default-Landscape-736h.png" width="2208" height="1242"/>
+        <icon height="40" src="res/ios/icon-20@2x.png" width="40" />
+        <icon height="60" src="res/ios/icon-20@3x.png" width="60" />
+        <icon height="180" src="res/ios/icon-60@3x.png" width="180" />
+        <icon height="60" src="res/ios/icon-60.png" width="60" />
+        <icon height="120" src="res/ios/icon-60@2x.png" width="120" />
+        <icon height="76" src="res/ios/icon-76.png" width="76" />
+        <icon height="152" src="res/ios/icon-76@2x.png" width="152" />
+        <icon height="40" src="res/ios/icon-40.png" width="40" />
+        <icon height="80" src="res/ios/icon-40@2x.png" width="80" />
+        <icon height="120" src="res/ios/icon-40@3x.png" width="120" />
+        <icon height="57" src="res/ios/icon.png" width="57" />
+        <icon height="114" src="res/ios/icon@2x.png" width="114" />
+        <icon height="72" src="res/ios/icon-72.png" width="72" />
+        <icon height="144" src="res/ios/icon-72@2x.png" width="144" />
+        <icon height="29" src="res/ios/icon-small.png" width="29" />
+        <icon height="58" src="res/ios/icon-small@2x.png" width="58" />
+        <icon height="50" src="res/ios/icon-50.png" width="50" />
+        <icon height="100" src="res/ios/icon-50@2x.png" width="100" />
+        <icon height="167" src="res/ios/icon-83.5@2x.png" width="167" />
+        <splash height="480" src="res/screen/ios/Default~iphone.png" width="320" />
+        <splash height="960" src="res/screen/ios/Default@2x~iphone.png" width="640" />
+        <splash height="1024" src="res/screen/ios/Default-Portrait~ipad.png" width="768" />
+        <splash height="2048" src="res/screen/ios/Default-Portrait@2x~ipad.png" width="1536" />
+        <splash height="768" src="res/screen/ios/Default-Landscape~ipad.png" width="1024" />
+        <splash height="1536" src="res/screen/ios/Default-Landscape@2x~ipad.png" width="2048" />
+        <splash height="1136" src="res/screen/ios/Default-568h@2x~iphone.png" width="640" />
+        <splash height="1334" src="res/screen/ios/Default-667h.png" width="750" />
+        <splash height="2208" src="res/screen/ios/Default-736h.png" width="1242" />
+        <splash height="1242" src="res/screen/ios/Default-Landscape-736h.png" width="2208" />
     </platform>
-
+    <engine name="ios" spec="~4.4.0" />
+    <plugin name="android-camera-permission" spec="~1.0.0" />
+    <plugin name="cordova-custom-config" spec="~3.2.0" />
+    <plugin name="cordova-plugin-android-permissions" spec="~0.11.0" />
+    <plugin name="cordova-plugin-console" spec="~1.0.7" />
+    <plugin name="cordova-plugin-device" spec="~1.1.6" />
+    <plugin name="cordova-plugin-iosrtc" spec="~4.0.1" />
+    <plugin name="cordova-plugin-media" spec="~3.0.1" />
+    <plugin name="cordova-plugin-whitelist" spec="1" />
 </widget>

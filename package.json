@@ -1,0 +1,31 @@
+{
+    "name": "com.apizee.hellortc",
+    "version": "0.2.1",
+    "displayName": "HelloRTC",
+    "cordova": {
+        "platforms": [
+            "ios"
+        ],
+        "plugins": {
+            "android-camera-permission": {},
+            "cordova-custom-config": {},
+            "cordova-plugin-android-permissions": {},
+            "cordova-plugin-console": {},
+            "cordova-plugin-device": {},
+            "cordova-plugin-iosrtc": {},
+            "cordova-plugin-media": {},
+            "cordova-plugin-whitelist": {}
+        }
+    },
+    "dependencies": {
+        "cordova-ios": "~4.4.0",
+        "android-camera-permission": "~1.0.0",
+        "cordova-custom-config": "~3.2.0",
+        "cordova-plugin-android-permissions": "~0.11.0",
+        "cordova-plugin-console": "~1.0.7",
+        "cordova-plugin-device": "~1.1.6",
+        "cordova-plugin-iosrtc": "~4.0.1",
+        "cordova-plugin-media": "~3.0.1",
+        "cordova-plugin-whitelist": "1"
+    }
+}
