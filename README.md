@@ -26,7 +26,7 @@ cordova build android
 cordova run android --device
 ```
 
-Open [this link](https://demo.apizee.com/mobile/index.html) with Chrome to exchange with your mobile over webrtc
+Open [this link](https://apirtc.com/tutos/Mobile/index.html) with Chrome to exchange with your mobile over webrtc
 
 ## Requirements
 
