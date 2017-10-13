@@ -84,11 +84,11 @@
         <splash height="1242" src="res/screen/ios/Default-Landscape-736h.png" width="2208" />
     </platform>
     <engine name="android" spec="^6.2.3" />
-    <engine name="ios" spec="^4.4.0" />
+    <engine name="ios" spec="^4.5.1" />
     <plugin name="android-camera-permission" spec="^1.0.0" />
-    <plugin name="cordova-custom-config" spec="^3.2.0" />
+    <plugin name="cordova-custom-config" spec="^3.3.0" />
     <plugin name="cordova-plugin-android-permissions" spec="^0.10.0" />
-    <plugin name="cordova-plugin-console" spec="^1.0.7" />
+    <plugin name="cordova-plugin-console" spec="^1.1.0" />
     <plugin name="cordova-plugin-device" spec="^1.1.6" />
     <plugin name="cordova-plugin-iosrtc" spec="^4.0.2" />
     <plugin name="cordova-plugin-media" spec="^3.0.1" />
