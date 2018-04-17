@@ -83,8 +83,6 @@
         <splash height="2208" src="res/screen/ios/Default-736h.png" width="1242" />
         <splash height="1242" src="res/screen/ios/Default-Landscape-736h.png" width="2208" />
     </platform>
-    <engine name="android" spec="^6.2.3" />
-    <engine name="ios" spec="^4.5.1" />
     <plugin name="android-camera-permission" spec="^1.0.0" />
     <plugin name="cordova-custom-config" spec="^3.3.0" />
     <plugin name="cordova-plugin-android-permissions" spec="^0.10.0" />
@@ -93,4 +91,6 @@
     <plugin name="cordova-plugin-iosrtc" spec="^4.0.2" />
     <plugin name="cordova-plugin-media" spec="^3.0.1" />
     <plugin name="cordova-plugin-whitelist" spec="^1.3.2" />
+    <engine name="android" spec="^6.2.3" />
+    <engine name="ios" spec="^4.5.1" />
 </widget>
