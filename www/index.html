@@ -11,7 +11,7 @@
 
     <script src="https://cloud.apizee.com/libs/jquery-1.9.0.min.js"></script>
     <script src="cordova.js"></script>
-    <script src="https://cloud.apizee.com/apiRTC/v3.18/apiRTC-3.18.min.debug.js"></script>
+    <script src="https://cloud.apizee.com/apiRTC/v4.1/apiRTC-latest.min.js"></script>
 </head>
 
 <body>
@@ -20,14 +20,22 @@
     <div class="row">
         <input type="number" id="number" value="" class="form-control" placeholder="Enter Destination ID"/>
     </div>
+
     <div class="row" style="margin-top: 5px">
         <input id="call" type="button" value="Call" class="btn btn-success" style="width: 100%; border-radius: 0;" />
+        <input id="recordedCallVideo" type="button" value="Recorded Call" class="btn btn-danger" style="width: 100%; border-radius: 0;" />
         <input id="hangup" type="button" value="Hangup" class="btn btn-danger" style="width: 100%; border-radius: 0;display: none"/>
     </div>
+
     <div class="row" id="localNumber" style="text-align: center; font-size: 18px; margin-top: 5px">
     </div>
+
     <div class="row" style="text-align: center;">
         <span id="status" style="text-align: center">Registration Ongoing...</span>
+    </div>
+
+    <div class="row">
+        <label>Select Media device :</label>
     </div>
     <div class="row">
         <label>Audio source:</label>
@@ -35,16 +43,27 @@
             <option value="" disabled selected>Choose your option</option>
         </select>
     </div>
+
     <div class="row">
         <label>Video source:</label>
         <select class="browser-default" id='videoSource'>
             <option value="" disabled selected>Choose your option</option>
         </select>
     </div>
+
+    <div class="row">
+        <input id="updateMediaDeviceOnCall" type="button" value="updateMediaDeviceOnCall" class="btn btn-info" style="width: 100%; border-radius: 0;" />
+    </div>
+
+    <div class="row">
+        <div id="recordedStreamList" style="display: none;"><h5>List of available media:</h5></div>
+    </div>
+
     <div class="row" style="margin-top: 20px">
         <div id="remote" style="width:100%;">
         </div>
     </div>
+
     <div class="row">
         <div id="mini">
         </div>
@@ -54,7 +73,9 @@
 <script>
     var webRTCClient = null,
         audioSelect = document.querySelector("select#audioSource"),
+        callId = null,
         videoSelect = document.querySelector("select#videoSource");
+
 
     function selectMediaChange(){
         console.log('selectMediaChange');
@@ -65,6 +86,7 @@
         //Storing videoSourceId in localStorage
         localStorage.setItem("videoSourceId_" + apiRTC.session.apiCCId, videoSelect.value);
     }
+
     audioSelect.onchange = selectMediaChange;
     videoSelect.onchange = selectMediaChange;
 
@@ -77,86 +99,75 @@
 
     function incomingCallHandler(e) {
         $("#call").hide();
-        $("#number").hide();
+        $("#recordedCallVideo").hide();
         $("#hangup").show();
+        $("#number").hide();
         $('#status').hide();
         setTimeout(refreshVideoView,2000);
     }
 
+//UpdateMediaDeviceOnCall
+    function userMediaStopHandler(e) {
+        console.log('userMediaStopHandler :', e.detail);
+        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + e.detail.callId);
+    }
+
+    function remoteStreamRemovedHandler(e) {
+        console.log("remoteStreamRemovedHandler, e.detail :" + e.detail);
+        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + e.detail.callId);
+    }
+//UpdateMediaDeviceOnCall
+
     function hangupHandler(e) {
+        console.log('hangupHandler :' + e.detail.callId);
+        if (e.detail.lastEstablishedCall === true) {
+            $("#call").attr("disabled", false).val("Call");
+        }
+        console.log(e.detail.reason);
+        initMediaElementState(e.detail.callId);
+        callId = 0;
+
         $("#call").show();
+        $("#recordedCallVideo").show();
         $("#number").show();
         $("#hangup").hide();
-        $('#status').html(e.detail.reason);
-        $('#status').show();
-
-        initMediaElementState(e.detail.callId);
     }
 
     function userMediaErrorHandler(e) {
         $("#call").show();
+        $("#recordedCallVideo").show();
         $("#number").show();
         $("#hangup").hide();
     }
 
-    function initMediaElementState(callId) {
-        //function that remove media element on hangup
-
-        //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-    /*
-        removeElementFromDiv('mini', 'miniElt-' + callId)
-        removeElementFromDiv('remote', 'remoteElt-' + callId)
-    */
-        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + callId);
-        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + callId);
+    function initMediaElementState(cId) {
+        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + cId);
+        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + cId);
     }
 
     function userMediaSuccessHandler(e) {
+        callId = e.detail.callId;
         console.log("userMediaSuccessHandler e.detail.callId :" + e.detail.callId);
         console.log("userMediaSuccessHandler e.detail.callType :" + e.detail.callType);
         console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
         console.log("userMediaSuccessHandler e.detail.audioIsAvailable :" + e.detail.audioIsAvailable);
         console.log("userMediaSuccessHandler e.detail.videoIsAvailable :" + e.detail.videoIsAvailable);
-
-        //Adding local Stream in Div. Video is muted
-
-    //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-    /*
-        addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
-                        {width : "160px", height : "120px"}, true);
-    */
-
         var streamType = 'video';
 
         if( e.detail.videoIsAvailable === false) {
-            //User has no webcam
             streamType = 'audio';
         }
         webRTCClient.addStreamInDiv(e.detail.stream, streamType, "mini", 'miniElt-' + e.detail.callId, {width : "160px", height : "120px"}, true);
-
-        //localStream = e.detail.stream;
     }
 
     function remoteStreamAddedHandler(e) {
         refreshVideoView();
-
         console.log("remoteStreamAddedHandler:");
         console.log("remoteStreamAddedHandler, e.detail.callId :" + e.detail.callId);
         console.log("remoteStreamAddedHandler, e.detail.callType :" + e.detail.callType);
         console.log("remoteStreamAddedHandler e.detail.remoteId :" + e.detail.remoteId);
         console.log("remoteStreamAddedHandler e.detail.destCallType :" + e.detail.destCallType);
-
-        //Adding Remote Stream in Div. Video is not muted
-
-    //You can decide to manage your own stream display function or use the integrated one of ApiRTC
-    /*
-        addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId,
-                        {width : "640px", height : "480px"}, false);
-    */
-
-        // using e.detail.destCallType as streamType
-        webRTCClient.addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId,
-                        {}, false);
+        webRTCClient.addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId, {}, false);
     }
 
     function gotSources(sourceInfos) {
@@ -218,24 +229,52 @@
         }
     }
 
-    function sessionReadyHandler(e) {
+    function MCURecordingStartedHandler(e) {
+        console.log("MCURecordingStartedHandler :", e.detail);
+        console.log("MCURecordingStartedHandler mediaURL :", e.detail.mediaURL);
+    }
 
+    function MCURecordedStreamsAvailableHandler(e) {
+        $("#recordedStreamList").show();
+        $("#recordedStreamList").append('<li class="collection-item" id=' + e.detail.recordedFileName + '><div>' + 'File : ' + e.detail.recordedFileName + '<a href="' + e.detail.mediaURL + '" target="_blank" class="secondary-content">Play</a></div></li>');
+    }
+
+    function sessionReadyHandler(e) {
+        console.log('sessionReadyHandler:' + apiRTC.session.apiCCId);
+        console.log('CallId:' + e.detail.callId);
         apiRTC.addEventListener("incomingCall", incomingCallHandler);
         apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
         apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
-        apiRTC.addEventListener("hangup", hangupHandler);
         apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
+        //UpdateMediaDeviceOnCall
+        apiRTC.addEventListener("userMediaStop", userMediaStopHandler);
+        apiRTC.addEventListener("remoteStreamRemoved", remoteStreamRemovedHandler);
+        //UpdateMediaDeviceOnCall
+        apiRTC.addEventListener("MCURecordingStarted", MCURecordingStartedHandler);
+        apiRTC.addEventListener("MCURecordedStreamsAvailable", MCURecordedStreamsAvailableHandler);
+        apiRTC.addEventListener("hangup", hangupHandler);
 
-        webRTCClient = apiCC.session.createWebRTCClient({});
-
+        webRTCClient = apiRTC.session.createWebRTCClient({
+                status: "status" //Optionnal
+            });
         webRTCClient.getMediaDevices(gotSources);
+        webRTCClient.setAllowMultipleCalls(true);
+        webRTCClient.setMCUConnector('mcu4.apizee.com');
 
         $('#localNumber').html("Your local ID :<BR/>"+apiCC.session.apiCCId);
         $('#myMiniVideo').show();
         $('#status').hide();
 
+        //UpdateMediaDeviceOnCall
+        $("#updateMediaDeviceOnCall").click(function () {
+            console.log('updateMediaDeviceOnCall callId :' + callId);
+            console.log('updateMediaDeviceOnCall e.detail.callId :' + e.detail.callId);
+            console.log("updateMediaDeviceOnCall");
+            webRTCClient.updateMediaDeviceOnCall(callId);
+        });
         $("#call").click(function () {
             $("#call").hide();
+            $("#recordedCallVideo").hide();
             $("#number").hide();
             $("#hangup").show();
             $('#status').hide();
@@ -245,14 +284,43 @@
             setTimeout(refreshVideoView,4000);
             webRTCClient.call(destNumber);
         });
-
         $("#hangup").click(function () {
             $("#call").show();
+            $("#recordedCallVideo").show();
             $("#number").show();
             $("#hangup").hide();
 
             webRTCClient.hangUp();
         });
+
+        //Call establishment (recorded call)
+        $("#recordedCallVideo").click(function () {
+            $("#call").hide();
+            $("#recordedCallVideo").hide();
+            $("#hangup").show();
+            $("#hangup").attr("disabled", false).val("Hangup");
+
+            webRTCClient.hangUp();
+            var data = {
+            };
+            var callConfiguration = {
+                record: true
+            };
+            callId = webRTCClient.call($("#number").val(), data, callConfiguration);
+            console.log("callId on call =" + callId);
+            if (callId != null) {
+                addHangupButton(callId);
+            }
+        });
+    }
+
+    function addHangupButton(callId) {
+        var hangupButtons = document.getElementById("hangupButtons"),
+        input = document.createElement("input");
+        input.setAttribute("id", "hangup-" + callId);
+        input.setAttribute("value", "hangup-" + callId);
+        input.setAttribute("type", "button");
+        input.setAttribute("onclick", "webRTCClient.hangUp(" + callId + " );");
     }
 
     function onDeviceReady() {
@@ -260,7 +328,6 @@
         if ((typeof device !== "undefined") && device.platform == 'iOS'){
             cordova.plugins.iosrtc.registerGlobals();
         }
-
 
         if ((typeof device !== "undefined") && device.platform == 'Android'){
             var permissions = cordova.plugins.permissions;
@@ -305,7 +372,6 @@
             onReady: sessionReadyHandler,
             apiKey : "myDemoApiKey"
         });
-
     }
 
     var app = document.URL.indexOf( 'https://' ) === -1;
