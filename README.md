@@ -26,14 +26,14 @@ cordova build android
 cordova run android --device
 ```
 
-Open [this link](https://dev.apirtc.com/tutos/Mobile/index.html) with Chrome to exchange with your mobile over webrtc
+Open [this link](https://dev.apirtc.com/demo/peertopeer_call/index.html) with Chrome to exchange with your mobile over webrtc
 
 ## Requirements
 
 In order to make this application run into a iOS application some requirements must be satisfied in both development computer and target devices:
 
 * Xcode >= 7.2.1
-* iOS >= 9 (run on lower versions at your own risk, but don't report issues)
+* iOS >= 10.2 (run on lower versions at your own risk, but don't report issues)
 * `cordova-ios` 4.X
 
 ## ApiRTC key
@@ -107,6 +107,6 @@ cordova plugin remove cordova-plugin-crosswalk-webview
 
 ##Try your project
 
-In order to test, open [this link](https://dev.apirtc.com/tutos/Mobile/index.html) on your computer browser:
+In order to test, open [this link](https://dev.apirtc.com/demo/peertopeer_call/index.html) on your computer browser:
 
 You will be able to establish a webRTC call between your app and your computer using the number that has been automatically assigned to your apiRTC Client.

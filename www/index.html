@@ -2,16 +2,9 @@
 <html>
 <head>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .remote video {
-            width: 100% !important;
-        }
-    </style>
-
     <script src="https://cloud.apizee.com/libs/jquery-1.9.0.min.js"></script>
     <script src="cordova.js"></script>
-    <script src="https://cloud.apizee.com/apiRTC/v4.1/apiRTC-latest.min.js"></script>
+    <script type="text/javascript" src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
 </head>
 
 <body>
@@ -23,72 +16,131 @@
 
     <div class="row" style="margin-top: 5px">
         <input id="call" type="button" value="Call" class="btn btn-success" style="width: 100%; border-radius: 0;" />
+<!--
         <input id="recordedCallVideo" type="button" value="Recorded Call" class="btn btn-danger" style="width: 100%; border-radius: 0;" />
-        <input id="hangup" type="button" value="Hangup" class="btn btn-danger" style="width: 100%; border-radius: 0;display: none"/>
+-->
     </div>
 
-    <div class="row" id="localNumber" style="text-align: center; font-size: 18px; margin-top: 5px">
+    <div class="row" style="position:absolute;"></div>
+        <div id="hangupButtons">
+        </div>
     </div>
+
+    <legend id="my-number"></legend>
 
     <div class="row" style="text-align: center;">
         <span id="status" style="text-align: center">Registration Ongoing...</span>
     </div>
 
-    <div class="row">
-        <label>Select Media device :</label>
+    <div class='row' style="margin-left: 5px; margin-right: 5px">
+        <form id="select-device">
+            <div class="col-2">
+                <div class="center">
+                    <legend id="my-camera">Camera : </legend>
+                    <select id='select-camera' name="camera" class="custom-select" placeholder="No camera"></select>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="center">
+                    <legend id="my-mic">Microphone :</legend>
+                    <select id='select-mic' name="camera" class="custom-select" placeholder="No microphone" ></select>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="row">
-        <label>Audio source:</label>
-        <select class="browser-default" id='audioSource'>
-            <option value="" disabled selected>Choose your option</option>
-        </select>
-    </div>
-
-    <div class="row">
-        <label>Video source:</label>
-        <select class="browser-default" id='videoSource'>
-            <option value="" disabled selected>Choose your option</option>
-        </select>
-    </div>
-
-    <div class="row">
-        <input id="updateMediaDeviceOnCall" type="button" value="updateMediaDeviceOnCall" class="btn btn-info" style="width: 100%; border-radius: 0;" />
-    </div>
-
+<!--
     <div class="row">
         <div id="recordedStreamList" style="display: none;"><h5>List of available media:</h5></div>
     </div>
-
-    <div class="row" style="margin-top: 20px">
-        <div id="remote" style="width:100%;">
+-->
+    <div class="row" style="margin-top: 20px; margin-left: 5px; margin-right: 5px">
+        <div id="remote-container" style="width:100%;">
+        </div>
+        <div id="local-container">
         </div>
     </div>
 
-    <div class="row">
-        <div id="mini">
-        </div>
-    </div>
 </div>
 
 <script>
-    var webRTCClient = null,
-        audioSelect = document.querySelector("select#audioSource"),
-        callId = null,
-        videoSelect = document.querySelector("select#videoSource");
+
+    //apiRTC.setLogLevel(10);
+
+    var ua = null,
+        selectCamera = document.getElementById("select-camera"),
+        selectMic = document.getElementById("select-mic"),
+        localCall = null,
+        localStream = null,
+        selectedAudioInputId = null,
+        selectedVideoInputId = null;
+
+    selectCamera.onchange = function (e) {
+        console.log("selectCamera onchange :", e);
+        createStream();
+    };
+    selectMic.onchange = function (e) {
+        console.log("selectMic onchange :", e);
+        createStream();
+    };
+
+    //==============================
+    // CREATE LOCAL STREAM
+    //==============================
+    var createStream = function () {
+        // Release old stream if it exists
+
+        if (localStream !== null) {
+            localStream.release();
+        }
+
+        var createStreamOptions = {};
+        createStreamOptions.audioInputId = selectMic.value;
+        createStreamOptions.videoInputId = selectCamera.value;
+        createStreamOptions.constraints = {
+            audio: true,
+            video: true
+        }
 
 
-    function selectMediaChange(){
-        console.log('selectMediaChange');
-        webRTCClient.setAudioSourceId(audioSelect.value);
-        //Storing audioSourceId in localStorage
-        localStorage.setItem("audioSourceId_" + apiRTC.session.apiCCId, audioSelect.value);
-        webRTCClient.setVideoSourceId(videoSelect.value);
-        //Storing videoSourceId in localStorage
-        localStorage.setItem("videoSourceId_" + apiRTC.session.apiCCId, videoSelect.value);
-    }
+    /*
+        if (apiRTC.osName === "iOS" || apiRTC.osName === "Android") {
+            createStreamOptions.facingMode = 'environment';
+        } else {
+            createStreamOptions.videoInputId = selectCamera.value;
+        }
+    */
+    /*
+        createStreamOptions.videoInputId = selectCamera.value;
+        createStreamOptions.facingMode = 'environment';
+    */
+        let callbacks = {};
+        callbacks.getStream = () => {
+            return new Promise((resolve, reject) => {
+                ua.createStream(createStreamOptions)
+                .then(function (stream) {
 
-    audioSelect.onchange = selectMediaChange;
-    videoSelect.onchange = selectMediaChange;
+                    // Save local stream
+                    localStream = stream;
+                    stream.removeFromDiv('local-container', 'local-media');
+                    stream.addInDiv('local-container', 'local-media', {}, true);
+                    return resolve(stream);
+                })
+                .catch(function (err) {
+                    console.error('create stream error', err);
+                    document.getElementById('error-device').innerHTML = 'ERROR :' + err.error.message;
+                    document.getElementById('error-device').style.display = "block";
+                    reject()
+                    });
+            });
+        };
+
+        if (localCall !== null) {
+            //Switch the camera if call is ongoing
+            return localCall.replacePublishedStreams(null, callbacks);
+        } else {
+            return callbacks.getStream();
+        }
+    };
 
     function refreshVideoView() {
         if ((typeof device !== "undefined") && device.platform == 'iOS'){
@@ -97,230 +149,256 @@
         }
     }
 
-    function incomingCallHandler(e) {
-        $("#call").hide();
-        $("#recordedCallVideo").hide();
-        $("#hangup").show();
-        $("#number").hide();
-        $('#status').hide();
-        setTimeout(refreshVideoView,2000);
-    }
-
-//UpdateMediaDeviceOnCall
-    function userMediaStopHandler(e) {
-        console.log('userMediaStopHandler :', e.detail);
-        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + e.detail.callId);
-    }
-
-    function remoteStreamRemovedHandler(e) {
-        console.log("remoteStreamRemovedHandler, e.detail :" + e.detail);
-        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + e.detail.callId);
-    }
-//UpdateMediaDeviceOnCall
-
-    function hangupHandler(e) {
-        console.log('hangupHandler :' + e.detail.callId);
-        if (e.detail.lastEstablishedCall === true) {
-            $("#call").attr("disabled", false).val("Call");
-        }
-        console.log(e.detail.reason);
-        initMediaElementState(e.detail.callId);
-        callId = 0;
-
-        $("#call").show();
-        $("#recordedCallVideo").show();
-        $("#number").show();
-        $("#hangup").hide();
-    }
-
-    function userMediaErrorHandler(e) {
-        $("#call").show();
-        $("#recordedCallVideo").show();
-        $("#number").show();
-        $("#hangup").hide();
-    }
-
-    function initMediaElementState(cId) {
-        webRTCClient.removeElementFromDiv('mini', 'miniElt-' + cId);
-        webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + cId);
-    }
-
-    function userMediaSuccessHandler(e) {
-        callId = e.detail.callId;
-        console.log("userMediaSuccessHandler e.detail.callId :" + e.detail.callId);
-        console.log("userMediaSuccessHandler e.detail.callType :" + e.detail.callType);
-        console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
-        console.log("userMediaSuccessHandler e.detail.audioIsAvailable :" + e.detail.audioIsAvailable);
-        console.log("userMediaSuccessHandler e.detail.videoIsAvailable :" + e.detail.videoIsAvailable);
-        var streamType = 'video';
-
-        if( e.detail.videoIsAvailable === false) {
-            streamType = 'audio';
-        }
-        webRTCClient.addStreamInDiv(e.detail.stream, streamType, "mini", 'miniElt-' + e.detail.callId, {width : "160px", height : "120px"}, true);
-    }
-
-    function remoteStreamAddedHandler(e) {
-        refreshVideoView();
-        console.log("remoteStreamAddedHandler:");
-        console.log("remoteStreamAddedHandler, e.detail.callId :" + e.detail.callId);
-        console.log("remoteStreamAddedHandler, e.detail.callType :" + e.detail.callType);
-        console.log("remoteStreamAddedHandler e.detail.remoteId :" + e.detail.remoteId);
-        console.log("remoteStreamAddedHandler e.detail.destCallType :" + e.detail.destCallType);
-        webRTCClient.addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId, {}, false);
-    }
-
-    function gotSources(sourceInfos) {
-        console.log('gotSources');
-        var audioDeviceFound = false,
-        videoDeviceFound = false,
-        i = 0,
-        audioSourceIdInLocalStorage = localStorage.getItem('audioSourceId_' + apiRTC.session.apiCCId),
-        videoSourceIdInLocalStorage = localStorage.getItem('videoSourceId_' + apiRTC.session.apiCCId);
-
-        if(sourceInfos !== null) {
-            for (i = 0; i != sourceInfos.length; ++i) {
-                var sourceInfo = sourceInfos[i];
-                console.log('sourceInfo :', sourceInfo);
-                var option = document.createElement("option");
-                option.value = sourceInfo.id || sourceInfo.deviceId;
-                console.log('option.value :', option.value);
-                //ENUMERATE
-                if (sourceInfo.kind === 'audio' || sourceInfo.kind === 'audioinput') {
-                    //ENUMERATE
-                    console.log('audio');
-                    option.text = sourceInfo.label || 'microphone ' + (audioSelect.length);
-                    audioSelect.appendChild(option);
-                    //ENUMERATE
-                } else if (sourceInfo.kind === 'video' || sourceInfo.kind === 'videoinput') {
-                    //ENUMERATE
-                    console.log('video');
-                    option.text = sourceInfo.label || 'camera ' + (videoSelect.length);
-                    videoSelect.appendChild(option);
-                } else {
-                    console.log('Some other kind of source: ', sourceInfo);
+    function setCallListeners(call) {
+        call
+            .on("localStreamAvailable", function (stream) {
+                refreshVideoView();
+                console.log('localStreamAvailable');
+                stream.addInDiv('local-container', 'local-media-' + stream.getId(), {width : "160px", height : "120px"}, true);
+                stream
+                    .on("stopped", function () { //When client receives an screenSharing call from another user
+                        console.error("Stream stopped");
+                        $('#local-media-' + stream.getId()).remove();
+                    });
+            })
+            .on("streamAdded", function (stream) {
+                refreshVideoView();
+                console.log('stream :', stream);
+                stream.addInDiv('remote-container', 'remote-media-' + stream.getId(), {}, false);
+            })
+            .on('streamRemoved', function (stream) {
+                refreshVideoView();
+                // Remove media element
+                document.getElementById('remote-media-' + stream.getId()).remove();
+            })
+            .on('userMediaError', function (e) {
+                console.log('userMediaError detected : ', e);
+                console.log('userMediaError detected with error : ', e.error);
+                //Checking if tryAudioCallActivated
+                if (e.tryAudioCallActivated === false) {
+                    $('#hangup-' + call.getId()).remove();
                 }
-                if (sourceInfo.id === audioSourceIdInLocalStorage) {
-                    audioDeviceFound = true;
-                }
-                if (sourceInfo.id === videoSourceIdInLocalStorage) {
-                    videoDeviceFound = true;
-                }
-            }
-        } else {
-            console.log("Media detection is not supported by browser");
-        }
-
-        if (audioDeviceFound) {
-            console.log("setting with localStorage audioSourceId value");
-            audioSelect.value = audioSourceIdInLocalStorage;
-            webRTCClient.setAudioSourceId(audioSourceIdInLocalStorage);
-        } else {
-            //removing audioSourceId from localStorage
-            localStorage.removeItem("audioSourceId_" + apiRTC.session.apiCCId);
-        }
-        if (videoDeviceFound) {
-            console.log("setting with localStorage videoSourceId value");
-            videoSelect.value = videoSourceIdInLocalStorage;
-            webRTCClient.setVideoSourceId(videoSourceIdInLocalStorage);
-        } else {
-            //removing videoSourceId from localStorage
-            localStorage.removeItem("videoSourceId_" + + apiRTC.session.apiCCId);
-        }
-    }
-
-    function MCURecordingStartedHandler(e) {
-        console.log("MCURecordingStartedHandler :", e.detail);
-        console.log("MCURecordingStartedHandler mediaURL :", e.detail.mediaURL);
-    }
-
-    function MCURecordedStreamsAvailableHandler(e) {
-        $("#recordedStreamList").show();
-        $("#recordedStreamList").append('<li class="collection-item" id=' + e.detail.recordedFileName + '><div>' + 'File : ' + e.detail.recordedFileName + '<a href="' + e.detail.mediaURL + '" target="_blank" class="secondary-content">Play</a></div></li>');
-    }
-
-    function sessionReadyHandler(e) {
-        console.log('sessionReadyHandler:' + apiRTC.session.apiCCId);
-        console.log('CallId:' + e.detail.callId);
-        apiRTC.addEventListener("incomingCall", incomingCallHandler);
-        apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
-        apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
-        apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
-        //UpdateMediaDeviceOnCall
-        apiRTC.addEventListener("userMediaStop", userMediaStopHandler);
-        apiRTC.addEventListener("remoteStreamRemoved", remoteStreamRemovedHandler);
-        //UpdateMediaDeviceOnCall
-        apiRTC.addEventListener("MCURecordingStarted", MCURecordingStartedHandler);
-        apiRTC.addEventListener("MCURecordedStreamsAvailable", MCURecordedStreamsAvailableHandler);
-        apiRTC.addEventListener("hangup", hangupHandler);
-
-        webRTCClient = apiRTC.session.createWebRTCClient({
-                status: "status" //Optionnal
+            })
+            .on('desktopCapture', function (e) {
+                console.log('desktopCapture event : ', e);
+                $('#hangup-' + call.getId()).remove();
+            })
+            .on('hangup', function () {
+                $('#hangup-' + call.getId()).remove();
+                localCall = null;
+                $("#call").show();
+                $("#recordedCallVideo").show();
+                $("#number").show();
+                refreshVideoView();
             });
-        webRTCClient.getMediaDevices(gotSources);
-        webRTCClient.setAllowMultipleCalls(true);
-        webRTCClient.setMCUConnector('mcu4.apizee.com');
+    }
 
-        $('#localNumber').html("Your local ID :<BR/>"+apiCC.session.apiCCId);
-        $('#myMiniVideo').show();
-        $('#status').hide();
+    function hangupCall(callId) {
+        console.log("hangupCall :", callId);
 
-        //UpdateMediaDeviceOnCall
-        $("#updateMediaDeviceOnCall").click(function () {
-            console.log('updateMediaDeviceOnCall callId :' + callId);
-            console.log('updateMediaDeviceOnCall e.detail.callId :' + e.detail.callId);
-            console.log("updateMediaDeviceOnCall");
-            webRTCClient.updateMediaDeviceOnCall(callId);
-        });
-        $("#call").click(function () {
-            $("#call").hide();
-            $("#recordedCallVideo").hide();
-            $("#number").hide();
-            $("#hangup").show();
-            $('#status').hide();
+        $("#call").show();
+        $("#recordedCallVideo").show();
+        $("#number").show();
+       // $("#hangup").hide();
 
-            destNumber = $("#number").val();
-            console.log("send REFRESH");
-            setTimeout(refreshVideoView,4000);
-            webRTCClient.call(destNumber);
-        });
-        $("#hangup").click(function () {
-            $("#call").show();
-            $("#recordedCallVideo").show();
-            $("#number").show();
-            $("#hangup").hide();
-
-            webRTCClient.hangUp();
-        });
-
-        //Call establishment (recorded call)
-        $("#recordedCallVideo").click(function () {
-            $("#call").hide();
-            $("#recordedCallVideo").hide();
-            $("#hangup").show();
-            $("#hangup").attr("disabled", false).val("Hangup");
-
-            webRTCClient.hangUp();
-            var data = {
-            };
-            var callConfiguration = {
-                record: true
-            };
-            callId = webRTCClient.call($("#number").val(), data, callConfiguration);
-            console.log("callId on call =" + callId);
-            if (callId != null) {
-                addHangupButton(callId);
-            }
-        });
+        $('#hangup-' + callId).remove();
+        //Getting call from ApiRTC call lists
+        var call = connectedSession.getCall(callId);
+        call.hangUp();
+        refreshVideoView();
     }
 
     function addHangupButton(callId) {
-        var hangupButtons = document.getElementById("hangupButtons"),
-        input = document.createElement("input");
-        input.setAttribute("id", "hangup-" + callId);
-        input.setAttribute("value", "hangup-" + callId);
-        input.setAttribute("type", "button");
-        input.setAttribute("onclick", "webRTCClient.hangUp(" + callId + " );");
+        $("#hangupButtons").append('<input id="hangup-' + callId + '" class="btn btn-danger" type="button" style="width: 100%; border-radius: 0;" value="Hangup-' + callId + '" onclick="hangupCall(' + callId + ')" />');
+    }
+
+    $("#call").click(function () {
+
+        $("#call").hide();
+        $("#recordedCallVideo").hide();
+        $("#number").hide();
+        //$("#hangup").show();
+        $('#status').hide();
+
+        destNumber = $("#number").val();
+        console.log("send REFRESH");
+        setTimeout(refreshVideoView,4000);
+
+        var contact = connectedSession.getOrCreateContact($("#number").val());
+        localCall = contact.call(localStream);
+        //var call = contact.call(localStream, {audioOnly: true});
+        if (localCall !== null) {
+            setCallListeners(localCall);
+            addHangupButton(localCall.getId());
+        } else {
+            console.warn("Cannot establish call");
+
+            $("#call").show();
+            $("#recordedCallVideo").show();
+            $("#number").show();
+            $('#status').show();
+        }
+    });
+
+/*
+    //Call establishment (recorded call)
+    $("#recordedCallVideo").click(function () {
+        $("#call").hide();
+        $("#recordedCallVideo").hide();
+        $("#number").hide();
+        $('#status').hide();
+
+        var contact = connectedSession.getOrCreateContact($("#number").val());
+
+        var callConfiguration = {};
+            callConfiguration.record = true;
+
+        localCall = contact.call(localStream, callConfiguration);
+        if (localCall !== null) {
+            setCallListeners(localCall);
+            addHangupButton(localCall.getId());
+
+            //TODO add button for posibility to stopRecord : addStopRecordButton(call.getId());
+                //usage of call.stopRecording();
+
+        } else {
+            console.warn("Cannot establish call");
+
+            $("#call").show();
+            $("#recordedCallVideo").show();
+            $("#number").show();
+            $('#status').show();
+        }
+    });
+*/
+
+//SELECT_MEDIA
+    function updateDeviceList(res) {
+
+        console.log("updateDeviceList");
+
+        var cameras = [],
+            microphones = [],
+            option = null,
+            selectors = [selectCamera, selectMic],
+            i = 0,
+            v = 0;
+
+        //Cleaning selectors
+        selectors.forEach(function (select) {
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+        });
+
+        for (i = 0; i < Object.values(res.videoinput).length; i++) {
+            v = Object.values(res.videoinput)[i];
+            console.log('getCameras', v);
+            option = document.createElement("option");
+            option.text = v.label || 'camera ' + (cameras.length + 1);
+            option.value = v.id;
+            selectCamera.appendChild(option);
+            cameras.push(v);
+
+            if (v.id === selectedVideoInputId && selectedVideoInputId !== null) {
+                console.log("select caméra");
+                selectCamera.value = selectedVideoInputId;
+            }
+        }
+
+        for (i = 0; i < Object.values(res.audioinput).length; i++) {
+            v = Object.values(res.audioinput)[i];
+            console.log('getMicrophones', v);
+            option = document.createElement("option");
+            option.text = v.label || 'micro ' + (microphones.length + 1);
+            option.value = v.id;
+            selectMic.appendChild(option);
+            microphones.push(v);
+
+            if (v.id === selectedAudioInputId && selectedAudioInputId !== null) {
+                console.log("select audio");
+                selectMic.value = selectedAudioInputId;
+            }
+        }
+        console.log('getDevices', cameras, microphones);
+    }
+
+    function manageMediaDevices() {
+        console.log("manageMediaDevices");
+        var mediaDevices = ua.getUserMediaDevices();
+        console.log("manageMediaDevices :", mediaDevices);
+        updateDeviceList(mediaDevices);
+    }
+//SELECT_MEDIA
+
+    function startApiRTC() {
+
+        //==============================
+        // CREATE USER AGENT
+        //==============================
+        ua = new apiRTC.UserAgent({
+            uri: 'apzkey:myDemoApiKey'
+        });
+
+        //SELECT_MEDIA
+        ua.on("mediaDeviceChanged", function (updatedContacts) {
+            console.log("mediaDeviceChanged");
+            manageMediaDevices();
+        });
+        //SELECT_MEDIA
+        manageMediaDevices();
+
+        //==============================
+        // REGISTER
+        //==============================
+
+        var registerInformation = {};
+
+        ua.register(registerInformation).then(function (session) {
+
+            $('#status').hide();
+
+            // Save session
+            connectedSession = session;
+
+            // Display user number
+            document.getElementById('my-number').innerHTML = 'Your number is ' + connectedSession.id;
+
+            connectedSession
+                .on("contactListUpdate", function (updatedContacts) { //display a list of connected users
+                    console.log("MAIN - contactListUpdate", updatedContacts);
+                    //updateAddressBook();
+                })
+                //==============================
+                // WHEN A CONTACT CALLS ME
+                //==============================
+                .on('incomingCall', function (invitation) {
+                    console.log("MAIN - incomingCall");
+                    //==============================
+                    // ACCEPT CALL INVITATION
+                    //==============================
+                    invitation.accept()
+                        .then(function (call) {
+                            localCall = call;
+                            setCallListeners(call);
+                            addHangupButton(call.getId());
+                        });
+
+                    // Display hangup button
+                    document.getElementById('hangup').style.display = 'inline-block';
+                })
+                .on("incomingScreenSharingCall", function (call) { //When client receives an screenSharing call from another user
+                    console.log("screenSharing received from :", call.getContact().id);
+                    setCallListeners(call);
+                    addHangupButton(call.getId());
+                });
+
+            createStream();
+
+        }).catch(function (error) {
+            // error
+            console.error('User agent registration failed', error);
+        });
     }
 
     function onDeviceReady() {
@@ -366,12 +444,7 @@
                 }
             }
         }
-
-        apiRTC.init({
-            //apiCCId : "12", // Your can overide your number
-            onReady: sessionReadyHandler,
-            apiKey : "myDemoApiKey"
-        });
+        startApiRTC();
     }
 
     var app = document.URL.indexOf( 'https://' ) === -1;

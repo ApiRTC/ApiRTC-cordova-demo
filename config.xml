@@ -37,7 +37,7 @@
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-        <preference name="deployment-target" value="9.0" />
+        <preference name="deployment-target" value="10.2" />
         <preference name="BackupWebStorage" value="local" />
         <preference name="webviewbounce" value="false" />
         <preference name="UIWebViewBounce" value="false" />
@@ -87,10 +87,10 @@
     <plugin name="cordova-plugin-console" spec="^1.1.0" />
     <plugin name="cordova-custom-config" spec="^3.3.0" />
     <plugin name="cordova-plugin-device" spec="^1.1.7" />
-    <plugin name="cordova-plugin-iosrtc" spec="^4.0.2" />
     <plugin name="cordova-plugin-media" spec="^3.0.1" />
     <plugin name="android-camera-permission" spec="^1.0.0" />
     <plugin name="cordova-plugin-android-permissions" spec="^0.10.0" />
+    <plugin name="cordova-plugin-iosrtc" spec="^6.0.4" />
     <engine name="android" spec="^6.4.0" />
     <engine name="ios" spec="^4.5.5" />
 </widget>
