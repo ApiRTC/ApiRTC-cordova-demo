@@ -152,7 +152,6 @@
     function setCallListeners(call) {
         call
             .on("localStreamAvailable", function (stream) {
-                refreshVideoView();
                 console.log('localStreamAvailable');
                 stream.addInDiv('local-container', 'local-media-' + stream.getId(), {width : "160px", height : "120px"}, true);
                 stream
@@ -160,11 +159,12 @@
                         console.error("Stream stopped");
                         $('#local-media-' + stream.getId()).remove();
                     });
+                refreshVideoView();
             })
             .on("streamAdded", function (stream) {
-                refreshVideoView();
                 console.log('stream :', stream);
                 stream.addInDiv('remote-container', 'remote-media-' + stream.getId(), {}, false);
+                refreshVideoView();
             })
             .on('streamRemoved', function (stream) {
                 refreshVideoView();
@@ -377,15 +377,21 @@
                     //==============================
                     // ACCEPT CALL INVITATION
                     //==============================
-                    invitation.accept()
+                    invitation.accept(localStream)
                         .then(function (call) {
+
+                            $("#call").hide();
+                            $("#recordedCallVideo").hide();
+                            $("#number").hide();
+                            //$("#hangup").show();
+                            $('#status').hide();
+
                             localCall = call;
                             setCallListeners(call);
                             addHangupButton(call.getId());
-                        });
 
-                    // Display hangup button
-                    document.getElementById('hangup').style.display = 'inline-block';
+                            refreshVideoView();
+                        });
                 })
                 .on("incomingScreenSharingCall", function (call) { //When client receives an screenSharing call from another user
                     console.log("screenSharing received from :", call.getContact().id);
