@@ -90,7 +90,7 @@
     <plugin name="cordova-plugin-media" spec="^3.0.1" />
     <plugin name="android-camera-permission" spec="^1.0.0" />
     <plugin name="cordova-plugin-android-permissions" spec="^0.10.0" />
-    <plugin name="cordova-plugin-iosrtc" spec="^6.0.4" />
+    <plugin name="cordova-plugin-iosrtc" spec="^6.0.11" />
     <engine name="android" spec="^6.4.0" />
     <engine name="ios" spec="^4.5.5" />
 </widget>
