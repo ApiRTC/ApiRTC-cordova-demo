@@ -17,7 +17,7 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
-        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-minSdkVersion" value="22" />
         <uses-permission android:name="android.permission.CAMERA" />
         <uses-permission android:name="android.permission.RECORD_AUDIO" />
         <uses-feature android:name="android.hardware.camera" />
@@ -91,6 +91,5 @@
     <plugin name="android-camera-permission" spec="^1.0.0" />
     <plugin name="cordova-plugin-android-permissions" spec="^0.10.0" />
     <plugin name="cordova-plugin-iosrtc" spec="^6.0.11" />
-    <engine name="android" spec="^6.4.0" />
     <engine name="ios" spec="^4.5.5" />
 </widget>
