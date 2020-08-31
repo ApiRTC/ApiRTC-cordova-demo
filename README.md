@@ -3,6 +3,7 @@ This sample presents how to use apiRTC.js SDK with Cordova iOS/Andorid app.
 
 ## Installation
 First install Cordova:
+
 `npm install -g cordova`
 
 [Follow this link to get started with Cordova](https://cordova.apache.org/docs/en/latest/guide/cli/#installation-de-la-cli-de-cordova) 
@@ -11,9 +12,11 @@ First install Cordova:
 [Install Xcode](https://developer.apple.com/xcode/)
 
 Install iOS platform:
+
 `cordova platform add ios`
 
 Then run:
+
 `cordova prepare ios`
 
 Then run *.xcworkspace Xcode project from `platforms/ios` folder.
@@ -35,6 +38,7 @@ Install Android platform:
 `cordova platform add android`
 
 Then run:
+
 `cordova prepare android`
 
 Add required permissions to `platforms/android/app/src/main/AndroidManifest.xml`:
