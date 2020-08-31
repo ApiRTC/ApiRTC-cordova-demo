@@ -1,0 +1,41 @@
+body {
+    font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
+    height:100vh;
+    margin:0px;
+    padding: 00px;
+    /* Padding to avoid the "unsafe" areas behind notches in the screen */
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    width:100%;
+}
+
+#app {
+    display: none;
+}
+
+#callForm {
+    margin-top: 20px;
+}
+
+#conference {
+    padding-top: 40px;
+}
+
+#remoteStream {
+    display: block;
+    width: 200px;
+    height: 150px;
+}
+
+#localStream {
+    display: block;
+    width: 200px;
+    height: 150px;
+}
+
+#remoteStream video {
+    height: 150px;
+}
+
+#localStream video {
+    height: 150px;
+}

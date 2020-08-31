@@ -1,48 +1,67 @@
-# ApiRTC Cordova P2P call sample
+# ApiRTC Cordova P2P call sample 
+This sample presents how to use apiRTC.js SDK with Cordova iOS/Andorid app.
 
 ## Installation
-
 First install Cordova:
+`npm install -g cordova`
 
-`npm i cordova`
+[Follow this link to get started with Cordova](https://cordova.apache.org/docs/en/latest/guide/cli/#installation-de-la-cli-de-cordova) 
 
 ### iOS
+Install Xcode https://developer.apple.com/xcode/
 
-You should have Xcode installed.
+Install iOS platform:
+`cordova platform add ios`
 
 Then run:
-
 `cordova prepare ios`
 
 Then run *.xcworkspace Xcode project from `platforms/ios` folder.
 
 Setup certificates inside *Xcode -> Signing & Capabilities* project section.
 
-Then build from Xcode.
+Then build from Xcode or use Cordova deployment tools.
+
+[Read more about iOS deploying](https://cordova.apache.org/docs/en/latest/guide/platforms/ios/)
 
 You can test the app with our [web P2P call sample](https://dev.apirtc.com/demo/peertopeer_call/index.html) 
 
 ### Android
 
-You should have installed Android Studio.
+Install Android Studio https://developer.android.com/studio
 
-Then add Android platform compatible with used device Android version:
+Install Android platform:
 
-eg: `ionic cordova platform add android@9.0.0`
+`cordova platform add android`
+
+Then run:
+`cordova prepare android`
+
+Add required permissions to `platforms/android/app/src/main/AndroidManifest.xml`:
+```
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+```
 
 Then compile and deploy app to the connected device:
 
-`ionic cordova run android --device`
+`cordova run android --device`
+
+OR use Android Studio to build and run the app.
 
 You can test the app with our [web P2P call sample](https://dev.apirtc.com/demo/peertopeer_call/index.html) 
 
-
 ## Requirements
-- iOS: `cordova-ios` 5.1.1+
-- iOS: `cordova-plugin-iosrtc` 6.0.11 version temporary fixed due to degradations of its components ([details](https://github.com/cordova-rtc/cordova-plugin-iosrtc/issues/516)). Better check your `package.json` before rebuilding actions to verify you had this fixed version.
-- iOS: Xcode 11.5+
-- iOS: iOS 13.5+
+Tested on:
+- apiRTC 4
+- iOS: `cordova-ios` 6.1.0
+- iOS: Xcode 11.5
+- iOS: iOS 13.5
+- Android: `cordova-android` 9.0.0
 
-The app may work on lower iOS versions, but don't report issues.
+The app may work on lower libs versions, but don't report issues.
 
-- Android: app tested on Android 10 API 29 + cordova 9.0.0. It should work on lower versions, just be sure that your stack (Android version, `cordova-android` verision etc) has API compatible parts
+## ApiRTC key
+
+For this demo we use `myDemoApiKey` api key. Please register [on our website](https://cloud.apizee.com) to get your private api key.

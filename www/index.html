@@ -1,464 +1,71 @@
 <!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
 <html>
-<head>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cloud.apizee.com/libs/jquery-1.9.0.min.js"></script>
-    <script src="cordova.js"></script>
-    <script type="text/javascript" src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
-</head>
-
-<body>
-
-<div class="container-fluid" style="margin-top: 35px;margin-left: 5px; margin-right: 5px">
-    <div class="row">
-        <input type="number" id="number" value="" class="form-control" placeholder="Enter Destination ID"/>
-    </div>
-
-    <div class="row" style="margin-top: 5px">
-        <input id="call" type="button" value="Call" class="btn btn-success" style="width: 100%; border-radius: 0;" />
-<!--
-        <input id="recordedCallVideo" type="button" value="Recorded Call" class="btn btn-danger" style="width: 100%; border-radius: 0;" />
--->
-    </div>
-
-    <div class="row" style="position:absolute;"></div>
-        <div id="hangupButtons">
-        </div>
-    </div>
-
-    <legend id="my-number"></legend>
-
-    <div class="row" style="text-align: center;">
-        <span id="status" style="text-align: center">Registration Ongoing...</span>
-    </div>
-
-    <div class='row' style="margin-left: 5px; margin-right: 5px">
-        <form id="select-device">
-            <div class="col-2">
-                <div class="center">
-                    <legend id="my-camera">Camera : </legend>
-                    <select id='select-camera' name="camera" class="custom-select" placeholder="No camera"></select>
-                </div>
-            </div>
-            <div class="col-2">
-                <div class="center">
-                    <legend id="my-mic">Microphone :</legend>
-                    <select id='select-mic' name="camera" class="custom-select" placeholder="No microphone" ></select>
-                </div>
-            </div>
-        </form>
-    </div>
-<!--
-    <div class="row">
-        <div id="recordedStreamList" style="display: none;"><h5>List of available media:</h5></div>
-    </div>
--->
-    <div class="row" style="margin-top: 20px; margin-left: 5px; margin-right: 5px">
-        <div id="remote-container" style="width:100%;">
-        </div>
-        <div id="local-container">
-        </div>
-    </div>
-
-</div>
-
-<script>
-
-    //apiRTC.setLogLevel(10);
-
-    var ua = null,
-        selectCamera = document.getElementById("select-camera"),
-        selectMic = document.getElementById("select-mic"),
-        localCall = null,
-        localStream = null,
-        selectedAudioInputId = null,
-        selectedVideoInputId = null;
-
-    selectCamera.onchange = function (e) {
-        console.log("selectCamera onchange :", e);
-        createStream();
-    };
-    selectMic.onchange = function (e) {
-        console.log("selectMic onchange :", e);
-        createStream();
-    };
-
-    //==============================
-    // CREATE LOCAL STREAM
-    //==============================
-    var createStream = function () {
-        // Release old stream if it exists
-
-        if (localStream !== null) {
-            localStream.release();
-        }
-
-        var createStreamOptions = {};
-        createStreamOptions.audioInputId = selectMic.value;
-        createStreamOptions.videoInputId = selectCamera.value;
-        createStreamOptions.constraints = {
-            audio: true,
-            video: true
-        }
-
-
-    /*
-        if (apiRTC.osName === "iOS" || apiRTC.osName === "Android") {
-            createStreamOptions.facingMode = 'environment';
-        } else {
-            createStreamOptions.videoInputId = selectCamera.value;
-        }
-    */
-    /*
-        createStreamOptions.videoInputId = selectCamera.value;
-        createStreamOptions.facingMode = 'environment';
-    */
-        let callbacks = {};
-        callbacks.getStream = () => {
-            return new Promise((resolve, reject) => {
-                ua.createStream(createStreamOptions)
-                .then(function (stream) {
-
-                    // Save local stream
-                    localStream = stream;
-                    stream.removeFromDiv('local-container', 'local-media');
-                    stream.addInDiv('local-container', 'local-media', {}, true);
-                    return resolve(stream);
-                })
-                .catch(function (err) {
-                    console.error('create stream error', err);
-                    document.getElementById('error-device').innerHTML = 'ERROR :' + err.error.message;
-                    document.getElementById('error-device').style.display = "block";
-                    reject()
-                    });
-            });
-        };
-
-        if (localCall !== null) {
-            //Switch the camera if call is ongoing
-            return localCall.replacePublishedStreams(null, callbacks);
-        } else {
-            return callbacks.getStream();
-        }
-    };
-
-    function refreshVideoView() {
-        if ((typeof device !== "undefined") && device.platform == 'iOS'){
-            console.log("REFRESH");
-            cordova.plugins.iosrtc.refreshVideos();
-        }
-    }
-
-    function setCallListeners(call) {
-        call
-            .on("localStreamAvailable", function (stream) {
-                console.log('localStreamAvailable');
-                stream.addInDiv('local-container', 'local-media-' + stream.getId(), {width : "160px", height : "120px"}, true);
-                stream
-                    .on("stopped", function () { //When client receives an screenSharing call from another user
-                        console.error("Stream stopped");
-                        $('#local-media-' + stream.getId()).remove();
-                    });
-                refreshVideoView();
-            })
-            .on("streamAdded", function (stream) {
-                console.log('stream :', stream);
-                stream.addInDiv('remote-container', 'remote-media-' + stream.getId(), {}, false);
-                refreshVideoView();
-            })
-            .on('streamRemoved', function (stream) {
-                refreshVideoView();
-                // Remove media element
-                document.getElementById('remote-media-' + stream.getId()).remove();
-            })
-            .on('userMediaError', function (e) {
-                console.log('userMediaError detected : ', e);
-                console.log('userMediaError detected with error : ', e.error);
-                //Checking if tryAudioCallActivated
-                if (e.tryAudioCallActivated === false) {
-                    $('#hangup-' + call.getId()).remove();
-                }
-            })
-            .on('desktopCapture', function (e) {
-                console.log('desktopCapture event : ', e);
-                $('#hangup-' + call.getId()).remove();
-            })
-            .on('hangup', function () {
-                $('#hangup-' + call.getId()).remove();
-                localCall = null;
-                $("#call").show();
-                $("#recordedCallVideo").show();
-                $("#number").show();
-                refreshVideoView();
-            });
-    }
-
-    function hangupCall(callId) {
-        console.log("hangupCall :", callId);
-
-        $("#call").show();
-        $("#recordedCallVideo").show();
-        $("#number").show();
-       // $("#hangup").hide();
-
-        $('#hangup-' + callId).remove();
-        //Getting call from ApiRTC call lists
-        var call = connectedSession.getCall(callId);
-        call.hangUp();
-        refreshVideoView();
-    }
-
-    function addHangupButton(callId) {
-        $("#hangupButtons").append('<input id="hangup-' + callId + '" class="btn btn-danger" type="button" style="width: 100%; border-radius: 0;" value="Hangup-' + callId + '" onclick="hangupCall(' + callId + ')" />');
-    }
-
-    $("#call").click(function () {
-
-        $("#call").hide();
-        $("#recordedCallVideo").hide();
-        $("#number").hide();
-        //$("#hangup").show();
-        $('#status').hide();
-
-        destNumber = $("#number").val();
-        console.log("send REFRESH");
-        setTimeout(refreshVideoView,4000);
-
-        var contact = connectedSession.getOrCreateContact($("#number").val());
-        localCall = contact.call(localStream);
-        //var call = contact.call(localStream, {audioOnly: true});
-        if (localCall !== null) {
-            setCallListeners(localCall);
-            addHangupButton(localCall.getId());
-        } else {
-            console.warn("Cannot establish call");
-
-            $("#call").show();
-            $("#recordedCallVideo").show();
-            $("#number").show();
-            $('#status').show();
-        }
-    });
-
-/*
-    //Call establishment (recorded call)
-    $("#recordedCallVideo").click(function () {
-        $("#call").hide();
-        $("#recordedCallVideo").hide();
-        $("#number").hide();
-        $('#status').hide();
-
-        var contact = connectedSession.getOrCreateContact($("#number").val());
-
-        var callConfiguration = {};
-            callConfiguration.record = true;
-
-        localCall = contact.call(localStream, callConfiguration);
-        if (localCall !== null) {
-            setCallListeners(localCall);
-            addHangupButton(localCall.getId());
-
-            //TODO add button for posibility to stopRecord : addStopRecordButton(call.getId());
-                //usage of call.stopRecording();
-
-        } else {
-            console.warn("Cannot establish call");
-
-            $("#call").show();
-            $("#recordedCallVideo").show();
-            $("#number").show();
-            $('#status').show();
-        }
-    });
-*/
-
-//SELECT_MEDIA
-    function updateDeviceList(res) {
-
-        console.log("updateDeviceList");
-
-        var cameras = [],
-            microphones = [],
-            option = null,
-            selectors = [selectCamera, selectMic],
-            i = 0,
-            v = 0;
-
-        //Cleaning selectors
-        selectors.forEach(function (select) {
-            while (select.firstChild) {
-                select.removeChild(select.firstChild);
-            }
-        });
-
-        for (i = 0; i < Object.values(res.videoinput).length; i++) {
-            v = Object.values(res.videoinput)[i];
-            console.log('getCameras', v);
-            option = document.createElement("option");
-            option.text = v.label || 'camera ' + (cameras.length + 1);
-            option.value = v.id;
-            selectCamera.appendChild(option);
-            cameras.push(v);
-
-            if (v.id === selectedVideoInputId && selectedVideoInputId !== null) {
-                console.log("select caméra");
-                selectCamera.value = selectedVideoInputId;
-            }
-        }
-
-        for (i = 0; i < Object.values(res.audioinput).length; i++) {
-            v = Object.values(res.audioinput)[i];
-            console.log('getMicrophones', v);
-            option = document.createElement("option");
-            option.text = v.label || 'micro ' + (microphones.length + 1);
-            option.value = v.id;
-            selectMic.appendChild(option);
-            microphones.push(v);
-
-            if (v.id === selectedAudioInputId && selectedAudioInputId !== null) {
-                console.log("select audio");
-                selectMic.value = selectedAudioInputId;
-            }
-        }
-        console.log('getDevices', cameras, microphones);
-    }
-
-    function manageMediaDevices() {
-        console.log("manageMediaDevices");
-        var mediaDevices = ua.getUserMediaDevices();
-        console.log("manageMediaDevices :", mediaDevices);
-        updateDeviceList(mediaDevices);
-    }
-//SELECT_MEDIA
-
-    function startApiRTC() {
-
-        //==============================
-        // CREATE USER AGENT
-        //==============================
-        ua = new apiRTC.UserAgent({
-            uri: 'apzkey:myDemoApiKey'
-        });
-
-        //SELECT_MEDIA
-        ua.on("mediaDeviceChanged", function (updatedContacts) {
-            console.log("mediaDeviceChanged");
-            manageMediaDevices();
-        });
-        //SELECT_MEDIA
-        manageMediaDevices();
-
-        //==============================
-        // REGISTER
-        //==============================
-
-        var registerInformation = {};
-
-        ua.register(registerInformation).then(function (session) {
-
-            $('#status').hide();
-
-            // Save session
-            connectedSession = session;
-
-            // Display user number
-            document.getElementById('my-number').innerHTML = 'Your number is ' + connectedSession.id;
-
-            connectedSession
-                .on("contactListUpdate", function (updatedContacts) { //display a list of connected users
-                    console.log("MAIN - contactListUpdate", updatedContacts);
-                    //updateAddressBook();
-                })
-                //==============================
-                // WHEN A CONTACT CALLS ME
-                //==============================
-                .on('incomingCall', function (invitation) {
-                    console.log("MAIN - incomingCall");
-                    //==============================
-                    // ACCEPT CALL INVITATION
-                    //==============================
-                    invitation.accept(localStream)
-                        .then(function (call) {
-
-                            $("#call").hide();
-                            $("#recordedCallVideo").hide();
-                            $("#number").hide();
-                            //$("#hangup").show();
-                            $('#status').hide();
-
-                            localCall = call;
-                            setCallListeners(call);
-                            addHangupButton(call.getId());
-
-                            refreshVideoView();
-                        });
-                })
-                .on("incomingScreenSharingCall", function (call) { //When client receives an screenSharing call from another user
-                    console.log("screenSharing received from :", call.getContact().id);
-                    setCallListeners(call);
-                    addHangupButton(call.getId());
-                });
-
-            createStream();
-
-        }).catch(function (error) {
-            // error
-            console.error('User agent registration failed', error);
-        });
-    }
-
-    function onDeviceReady() {
-
-        if ((typeof device !== "undefined") && device.platform == 'iOS'){
-            cordova.plugins.iosrtc.registerGlobals();
-        }
-
-        if ((typeof device !== "undefined") && device.platform == 'Android'){
-            var permissions = cordova.plugins.permissions;
-            permissions.hasPermission(permissions.CAMERA, checkVideoPermissionCallback, null);
-            permissions.hasPermission(permissions.RECORD_AUDIO, checkAudioPermissionCallback, null);
-
-            function checkVideoPermissionCallback(status) {
-                if(!status.hasPermission) {
-                    var errorCallback = function() {
-                        alert('Camera permission is not turned on');
-                    }
-                    permissions.requestPermission(
-                            permissions.CAMERA,
-                            function(status) {
-                                if(!status.hasPermission) {
-                                    errorCallback();
-                                }
-                            },
-                            errorCallback);
-                }
-            }
-
-            function checkAudioPermissionCallback(status) {
-                if(!status.hasPermission) {
-                    var errorCallback = function() {
-                        alert('Audio permission is not turned on');
-                    }
-                    permissions.requestPermission(
-                            permissions.RECORD_AUDIO,
-                            function(status) {
-                                if(!status.hasPermission) {
-                                    errorCallback();
-                                }
-                            },
-                            errorCallback);
-                }
-            }
-        }
-        startApiRTC();
-    }
-
-    var app = document.URL.indexOf( 'https://' ) === -1;
-    if ( app ) {
-        document.addEventListener("deviceready", onDeviceReady, false);
-    } else {
-        onDeviceReady();
-    }
-</script>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+		<meta
+			http-equiv="Content-Security-Policy"
+			content=" media-src * blob: ; script-src * 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * blob: http: https: 'self' 'unsafe-inline' 'unsafe-eval' http://*/* https://*/* https://*:* "
+		/>
+
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="msapplication-tap-highlight" content="no" />
+		<meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover" />
+		<meta name="color-scheme" content="light dark" />
+		<link rel="stylesheet" href="css/index.css" />
+		<title>ApiRTC Cordova P2P Sample</title>
+	</head>
+	<body>
+		<div id="init">Initializing...</div>
+		<div id="app">
+			<div>Your id: <span id="yourId"></span></div>
+			<button id="hangupButton">Hangup</button>
+			<form id="callForm">
+				<label for="calleeId">Enter callee id:</label><br />
+				<input type="text" id="calleeId" /><br />
+				<input type="submit" value="Submit" />
+			</form>
+			<div id="conference">
+				<div id="localStream"></div>
+				<div id="remoteStream"></div>
+			</div>
+		</div>
+		<script
+			src="https://code.jquery.com/jquery-3.5.1.min.js"
+			integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+			crossorigin="anonymous"
+		></script>
+		<script src="cordova.js"></script>
+		<script
+			type="text/javascript"
+			src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.js"
+		></script>
+		<script src="js/index.js"></script>
+	</body>
 </html>
