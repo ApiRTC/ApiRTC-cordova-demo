@@ -10,12 +10,10 @@ First install Cordova:
 ### iOS
 [Install Xcode](https://developer.apple.com/xcode/)
 
-Install iOS platform:
-
+Install iOS platform:  
 `cordova platform add ios`
 
-Then run:
-
+Then run:  
 `cordova prepare ios`
 
 Then run *.xcworkspace Xcode project from `platforms/ios` folder.
@@ -32,12 +30,10 @@ You can test the app with our [web P2P call sample](https://dev.apirtc.com/demo/
 
 [Install Android Studio](https://developer.android.com/studio)
 
-Install Android platform:
-
+Install Android platform:  
 `cordova platform add android`
 
-Then run:
-
+Then run:  
 `cordova prepare android`
 
 Add required permissions to `platforms/android/app/src/main/AndroidManifest.xml`:
@@ -47,8 +43,7 @@ Add required permissions to `platforms/android/app/src/main/AndroidManifest.xml`
 <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 ```
 
-Then compile and deploy app to the connected device:
-
+Then compile and deploy app to the connected device:  
 `cordova run android --device`
 
 OR use Android Studio to build and run the app.
