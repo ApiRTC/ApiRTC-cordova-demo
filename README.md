@@ -8,7 +8,7 @@ First install Cordova:
 [Follow this link to get started with Cordova](https://cordova.apache.org/docs/en/latest/guide/cli/#installation-de-la-cli-de-cordova) 
 
 ### iOS
-Install Xcode https://developer.apple.com/xcode/
+[Install Xcode](https://developer.apple.com/xcode/)
 
 Install iOS platform:
 `cordova platform add ios`
@@ -28,7 +28,7 @@ You can test the app with our [web P2P call sample](https://dev.apirtc.com/demo/
 
 ### Android
 
-Install Android Studio https://developer.android.com/studio
+[Install Android Studio](https://developer.android.com/studio)
 
 Install Android platform:
 
