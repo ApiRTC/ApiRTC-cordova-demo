@@ -36,5 +36,6 @@
 			"ios",
 			"android"
 		]
-	}
+	},
+	"dependencies": {}
 }

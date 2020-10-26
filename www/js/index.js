@@ -14,6 +14,7 @@ function onDeviceReady() {
 	let cordova = window.cordova;
 	if (device !== undefined && device.platform === 'iOS') {
 		cordova.plugins.iosrtc.registerGlobals();
+		//cordova.plugins.iosrtc.selectAudioOutput('speaker');
 		//cordova.plugins.iosrtc.debug.enable('*', true);
 	}
 
