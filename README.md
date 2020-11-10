@@ -53,10 +53,13 @@ You can test the app with our [web P2P call sample](https://dev.apirtc.com/demo/
 ## Requirements
 Tested on:
 - apiRTC 4
-- iOS: `cordova-ios` 6.1.0
-- iOS: Xcode 11.5
-- iOS: iOS 13.5
-- Android: `cordova-android` 9.0.0
+### iOS
+- `cordova-ios` 6.1.0
+- Xcode 11.5
+- iOS 13.5
+### Android
+- Android 10
+- `cordova-android` 9.0.0
 
 The app may work on lower libs versions, but don't report issues.
 
