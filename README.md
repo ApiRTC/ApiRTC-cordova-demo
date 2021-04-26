@@ -10,6 +10,8 @@ First install Cordova:
 
 [Follow this link to get started with Cordova](https://cordova.apache.org/docs/en/latest/guide/cli/#installation-de-la-cli-de-cordova) 
 
+`npm i`
+
 ### iOS
 
 [Install Xcode](https://developer.apple.com/xcode/)
