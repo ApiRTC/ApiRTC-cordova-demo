@@ -8,17 +8,38 @@ let yourId = null;
 
 document.addEventListener('deviceready', onDeviceReady, false);
 
+function setUIState(state) {
+	switch (state) {
+		case 'init':
+			$('#init').show();
+			$('#app').hide();
+			break;
+		case 'ready':
+			$('#init').hide();
+			$('#app').show();
+			$('#callForm').show();
+			$('#yourId').text(connectedSession.getId());
+			$('#hangupButton').hide();
+			$('#conference').hide();
+			break;
+		case 'call':
+			$('#callForm').hide();
+			$('#hangupButton').show();
+			$('#conference').show();
+			break;
+		default:
+			break;
+	}
+}
+
 function onDeviceReady() {
+
 	setUIState('init');
 
 	let cordova = window.cordova;
-	if (device !== undefined && device.platform === 'iOS') {
-		cordova.plugins.iosrtc.registerGlobals();
-		//cordova.plugins.iosrtc.selectAudioOutput('speaker');
-		//cordova.plugins.iosrtc.debug.enable('*', true);
-	}
 
 	if (device !== undefined && device.platform === 'Android') {
+		
 		let permissions = cordova.plugins.permissions;
 
 		function checkVideoPermissionCallback(status) {
@@ -69,6 +90,7 @@ function onDeviceReady() {
 		cloudUrl: 'https://cloud.apizee.com',
 	};
 
+
 	ua.register(registerInformation)
 		.then((session) => {
 			console.log('User registered with session: ', session);
@@ -91,29 +113,7 @@ function onDeviceReady() {
 		});
 }
 
-function setUIState(state) {
-	switch (state) {
-		case 'init':
-			$('#init').show();
-			$('#app').hide();
-			break;
-		case 'ready':
-			$('#init').hide();
-			$('#app').show();
-			$('#callForm').show();
-			$('#yourId').text(connectedSession.getId());
-			$('#hangupButton').hide();
-			$('#conference').hide();
-			break;
-		case 'call':
-			$('#callForm').hide();
-			$('#hangupButton').show();
-			$('#conference').show();
-			break;
-		default:
-			break;
-	}
-}
+
 
 function setCallListeners() {
 	currentCall
